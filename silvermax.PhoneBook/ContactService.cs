@@ -1,0 +1,141 @@
+﻿using Azure;
+using Microsoft.EntityFrameworkCore;
+using silvermax.PhoneBook.DbAcess;
+using silvermax.PhoneBook.Dtos;
+using Spectre.Console;
+
+namespace silvermax.PhoneBook;
+
+public class ContactService(ContactDbContext dbContext, UserInput userInput, CancellationToken ct)
+{
+    public async Task AddContactToDb()
+    {
+        var response = userInput.GetInfo();
+
+        if (await dbContext.Contacts.AnyAsync(c => c.PhoneNumber == response.PhoneNumber, ct))
+            AnsiConsole.MarkupLine("[red]This phone number already exists[/]");
+
+        var contact = new Contact
+        {
+            Id = Guid.NewGuid(),
+            Name = response.Name!.ToLower(),
+            Email = response.Email!,
+            PhoneNumber = response.PhoneNumber!,
+            AddedAt = DateTime.UtcNow
+        };
+
+        dbContext.Add(contact);
+        await dbContext.SaveChangesAsync(ct);
+
+        Console.Clear();
+
+        AnsiConsole.MarkupLine("[green]Contact added successfully[/]");
+        AnsiConsole.MarkupLine("Press Any Key to continue...");
+        Console.ReadKey();
+    }
+
+    public async Task<List<ResponseDto>> ListContacts()
+    {
+        var contacts = await dbContext.Contacts
+            .Select(c => new ResponseDto { Id = c.Id, Name = c.Name, Email = c.Email, PhoneNumber = c.PhoneNumber})
+            .ToListAsync(ct);
+
+        Console.Clear();
+
+        return contacts;
+    }
+    
+    public async Task DeleteContact()
+    {
+        await DisplayContacts();
+
+        var contactToDelete = AnsiConsole.Ask<string>("[DarkOrange3_1]Please write the first name of the contact you want to delete:[/]");
+
+        bool confirmation = AnsiConsole.Confirm("[red]Are you sure you want to delete contact {contactToDelete}?[/]");
+
+        if (!confirmation)
+        {
+            AnsiConsole.MarkupLine("[DarkOrange3_1]Cancelled[/]");
+            AnsiConsole.MarkupLine("Press Any Key to continue...");
+            Console.ReadKey();
+            return;
+        }
+
+        var parts = contactToDelete.Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+
+        var firstName = parts[0];
+
+        var contact = await dbContext.Contacts.FirstOrDefaultAsync(c => c.Name == firstName.ToLower() || c.Name.StartsWith(firstName.ToLower() + " ") , ct);
+
+        if (contact is null)
+        {
+            AnsiConsole.MarkupLine("[red]Contact not found[/]");
+            return;
+        }
+
+        dbContext.Contacts.Remove(contact);
+        await dbContext.SaveChangesAsync(ct);
+
+        Console.Clear();
+
+        AnsiConsole.MarkupLine("[green]Contact deleted successfully[/]");
+        AnsiConsole.MarkupLine("Press Any Key to continue...");
+        Console.ReadKey();
+    }
+
+    public async Task UpdateContact()
+    {
+        await DisplayContacts();
+
+        var contactToEdit = AnsiConsole.Ask<string>("[DarkOrange3_1]Please choose the name of the contact you want to update:[/]");
+
+        var parts = contactToEdit.Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+
+        var firstName = parts[0];
+
+        var contact = await dbContext.Contacts.FirstOrDefaultAsync(c => c.Name == firstName.ToLower() || c.Name.StartsWith(firstName.ToLower() + " "), ct);
+
+        if (contact is null)
+        {
+            AnsiConsole.MarkupLine("[red]Contact not found[/]");
+            return;
+        }
+
+        var response = userInput.GetInfo();
+
+        contact.Name = response.Name!;
+        contact.Email = response.Email!;
+        contact.PhoneNumber = response.PhoneNumber!;
+
+        await dbContext.SaveChangesAsync(ct);
+
+        Console.Clear();
+
+        AnsiConsole.MarkupLine("[green]Contact updated successfully[/]");
+        AnsiConsole.MarkupLine("Press Any Key to continue...");
+        Console.ReadKey();
+    }
+
+    public async Task DisplayContacts()
+    {
+        var contacts = await ListContacts();
+
+        var table = new Table { Border = TableBorder.Rounded };
+        table.AddColumn("[yellow]Id[/]");
+        table.AddColumn("[yellow]Name[/]");
+        table.AddColumn("[yellow]Email[/]");
+        table.AddColumn("[yellow]Phone Number[/]");
+
+        foreach (var c in contacts)
+        {
+            table.AddRow(
+                c.Id.ToString(),
+                $"[purple]{c.Name}[/]",
+                $"[purple]{c.Email}[/]",
+                $"[purple]{c.PhoneNumber}[/]"
+                );
+        }
+
+        AnsiConsole.Write(table);
+    }
+}
