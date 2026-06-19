@@ -41,7 +41,7 @@ public class UserInput
 
     public MailDto GetEmailInfo()
     {
-        var recipient = AnsiConsole.Ask<string>("[DarkOrange3_1]Please choose the name of the contact you want to send mail to:[/]");
+        var recipient = AnsiConsole.Ask<string>("[DarkOrange3_1]Please write the name of the contact you want to send mail to:[/]");
         var subject = AnsiConsole.Ask<string>("Please input the subject of the email:");
         var body = AnsiConsole.Ask<string>("Please write the body of the email:");
 
@@ -50,6 +50,18 @@ public class UserInput
             Name = recipient,
             Subject = subject,
             Message = body,
+        };
+    }
+
+    public SMSDto GetSMSInfo()
+    {
+        var recipient = AnsiConsole.Ask<string>("[DarkOrange3_1]Please write the name of the contact you want to send sms message to:[/]");
+        var message = AnsiConsole.Ask<string>("Please input the message you want to send:");
+
+        return new SMSDto
+        {
+            Name = recipient,
+            SMSMessage = message
         };
     }
 

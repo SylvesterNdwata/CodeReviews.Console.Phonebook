@@ -14,6 +14,7 @@ internal class Enums
         ListContacts,
         DeleteContact,
         SendMail,
+        SendSms,
         Exit
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using silvermax.PhoneBook;
 using silvermax.PhoneBook.DbAcess;
-using System;
+using silvermax.PhoneBook.Services;
 
 public class Program
 {
@@ -33,9 +33,10 @@ public class Program
 
         var input = scope.ServiceProvider.GetRequiredService<UserInput>();
         var contactService = new ContactService(db, input, CancellationToken.None);
-        var mailService = new MailService(contactService, configuration, input, db, CancellationToken.None);
+        var mailService = new MailService(configuration, input, db, CancellationToken.None);
+        var smsService = new SMSService(db, configuration, input, CancellationToken.None);
 
-        UserInterface ui = new(contactService, mailService);
+        UserInterface ui = new(contactService, mailService, smsService);
         await ui.Start();
     }
 }

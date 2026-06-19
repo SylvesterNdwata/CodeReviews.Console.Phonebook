@@ -1,10 +1,11 @@
 ﻿using silvermax.PhoneBook.DbAcess;
+using silvermax.PhoneBook.Services;
 using Spectre.Console;
 using static silvermax.PhoneBook.Enums;
 
 namespace silvermax.PhoneBook;
 
-public class UserInterface(ContactService service, MailService mailService)
+public class UserInterface(ContactService service, MailService mailService, SMSService smsService)
 {
     public async Task Start()
     {
@@ -39,7 +40,13 @@ public class UserInterface(ContactService service, MailService mailService)
                     break;
 
                 case Menu.SendMail:
+                    await service.DisplayContacts();
                     await mailService.SendMail();
+                    break;
+
+                case Menu.SendSms:
+                    await service.DisplayContacts();
+                    await smsService.SendSMS();
                     break;
 
                 case Menu.Exit:

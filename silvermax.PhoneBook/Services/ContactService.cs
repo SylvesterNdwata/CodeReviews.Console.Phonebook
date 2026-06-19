@@ -4,7 +4,7 @@ using silvermax.PhoneBook.DbAcess;
 using silvermax.PhoneBook.Dtos;
 using Spectre.Console;
 
-namespace silvermax.PhoneBook;
+namespace silvermax.PhoneBook.Services;
 
 public class ContactService(ContactDbContext dbContext, UserInput userInput, CancellationToken ct)
 {
@@ -117,7 +117,6 @@ public class ContactService(ContactDbContext dbContext, UserInput userInput, Can
         var contacts = await ListContacts();
 
         var table = new Table { Border = TableBorder.Rounded };
-        table.AddColumn("[yellow]Id[/]");
         table.AddColumn("[yellow]Name[/]");
         table.AddColumn("[yellow]Email[/]");
         table.AddColumn("[yellow]Phone Number[/]");
@@ -125,7 +124,6 @@ public class ContactService(ContactDbContext dbContext, UserInput userInput, Can
         foreach (var c in contacts)
         {
             table.AddRow(
-                c.Id.ToString(),
                 $"[purple]{c.Name}[/]",
                 $"[purple]{c.Email}[/]",
                 $"[purple]{c.PhoneNumber}[/]"

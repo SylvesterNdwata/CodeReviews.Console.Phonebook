@@ -7,10 +7,9 @@ using silvermax.PhoneBook.DbAcess;
 using Spectre.Console;
 using System.Net.Mail;
 
-namespace silvermax.PhoneBook;
+namespace silvermax.PhoneBook.Services;
 
-public class MailService(
-    ContactService service, 
+public class MailService( 
     IConfiguration config, 
     UserInput userInput,
     ContactDbContext db,
@@ -18,8 +17,6 @@ public class MailService(
 {
     public async Task SendMail()
     {
-        await service.DisplayContacts();
-
         var emailInfo = userInput.GetEmailInfo();
 
         var recipient = await db.Contacts.FirstOrDefaultAsync(c => c.Name == emailInfo.Name.ToLower() || c.Name.StartsWith(emailInfo.Name.ToLower() + " "), ct);
