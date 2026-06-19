@@ -4,7 +4,7 @@ using static silvermax.PhoneBook.Enums;
 
 namespace silvermax.PhoneBook;
 
-public class UserInterface(ContactService service)
+public class UserInterface(ContactService service, MailService mailService)
 {
     public async Task Start()
     {
@@ -22,7 +22,7 @@ public class UserInterface(ContactService service)
             {
                 case Menu.AddContact:
                     await service.AddContactToDb();
-                    Console.ReadKey();
+                    UIHelper.ContinueMessage();
                     break;
 
                 case Menu.UpdateContact:
@@ -31,12 +31,15 @@ public class UserInterface(ContactService service)
 
                 case Menu.ListContacts:
                     await service.DisplayContacts();
-                    AnsiConsole.MarkupLine("Press Any Key to continue...");
-                    Console.ReadKey();
+                    UIHelper.ContinueMessage();
                     break;
 
                 case Menu.DeleteContact:
                     await service.DeleteContact();
+                    break;
+
+                case Menu.SendMail:
+                    await mailService.SendMail();
                     break;
 
                 case Menu.Exit:

@@ -39,6 +39,20 @@ public class UserInput
         };
     }
 
+    public MailDto GetEmailInfo()
+    {
+        var recipient = AnsiConsole.Ask<string>("[DarkOrange3_1]Please choose the name of the contact you want to send mail to:[/]");
+        var subject = AnsiConsole.Ask<string>("Please input the subject of the email:");
+        var body = AnsiConsole.Ask<string>("Please write the body of the email:");
+
+        return new MailDto
+        {
+            Name = recipient,
+            Subject = subject,
+            Message = body,
+        };
+    }
+
     private bool IsValidPhoneNr(string number)
     {
         var phoneUtil = PhoneNumberUtil.GetInstance();

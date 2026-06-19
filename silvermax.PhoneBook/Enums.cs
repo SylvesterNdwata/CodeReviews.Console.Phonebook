@@ -5,7 +5,7 @@ namespace silvermax.PhoneBook;
 internal class Enums
 {
     internal static string ToDisplayName(Enum value) =>
-        Regex.Replace(value.ToString(), "(?<!^)([A-Z])", "$1");
+        Regex.Replace(value.ToString(), "(?<!^)([A-Z])", " $1");
 
     internal enum Menu
     {
@@ -13,6 +13,7 @@ internal class Enums
         UpdateContact,
         ListContacts,
         DeleteContact,
+        SendMail,
         Exit
     }
 }

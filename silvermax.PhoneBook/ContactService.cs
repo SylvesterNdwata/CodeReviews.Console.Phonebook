@@ -30,8 +30,7 @@ public class ContactService(ContactDbContext dbContext, UserInput userInput, Can
         Console.Clear();
 
         AnsiConsole.MarkupLine("[green]Contact added successfully[/]");
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.ContinueMessage();
     }
 
     public async Task<List<ResponseDto>> ListContacts()
@@ -56,8 +55,7 @@ public class ContactService(ContactDbContext dbContext, UserInput userInput, Can
         if (!confirmation)
         {
             AnsiConsole.MarkupLine("[DarkOrange3_1]Cancelled[/]");
-            AnsiConsole.MarkupLine("Press Any Key to continue...");
-            Console.ReadKey();
+            UIHelper.ContinueMessage();
             return;
         }
 
@@ -79,8 +77,7 @@ public class ContactService(ContactDbContext dbContext, UserInput userInput, Can
         Console.Clear();
 
         AnsiConsole.MarkupLine("[green]Contact deleted successfully[/]");
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.ContinueMessage();
     }
 
     public async Task UpdateContact()
@@ -112,8 +109,7 @@ public class ContactService(ContactDbContext dbContext, UserInput userInput, Can
         Console.Clear();
 
         AnsiConsole.MarkupLine("[green]Contact updated successfully[/]");
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.ContinueMessage();
     }
 
     public async Task DisplayContacts()

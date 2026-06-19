@@ -6,11 +6,15 @@ using silvermax.PhoneBook;
 using silvermax.PhoneBook.DbAcess;
 using System;
 
-public static class Program
+public class Program
 {
     private static async Task Main(string[] args)
     {
         using var host = Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddUserSecrets<Program>(optional: true);
+            })
             .ConfigureServices((context, services) =>
             {
                 services.AddDbContext<ContactDbContext>(opts =>
@@ -25,10 +29,13 @@ public static class Program
         await DataSeeder.SeedAsync(db);
         Console.Clear();
 
+        var configuration = host.Services.GetRequiredService<IConfiguration>();
+
         var input = scope.ServiceProvider.GetRequiredService<UserInput>();
         var contactService = new ContactService(db, input, CancellationToken.None);
+        var mailService = new MailService(contactService, configuration, input, db, CancellationToken.None);
 
-        UserInterface ui = new(contactService);
+        UserInterface ui = new(contactService, mailService);
         await ui.Start();
     }
 }
