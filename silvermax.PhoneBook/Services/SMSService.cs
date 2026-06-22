@@ -4,6 +4,7 @@ using silvermax.PhoneBook.DbAcess;
 using Spectre.Console;
 using System.Linq.Expressions;
 using Twilio;
+using Twilio.Exceptions;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 
@@ -58,10 +59,19 @@ public class SMSService(
 
         TwilioClient.Init(authSid, authToken);
 
-        var message = MessageResource.Create(
+        try
+        {
+            var message = MessageResource.Create(
             new PhoneNumber(recipientNumber),
             from: new PhoneNumber(phoneNumber),
             body: smsMessage.SMSMessage
             );
+        }
+        catch (ApiException ex)
+        {
+            AnsiConsole.WriteLine($"Twilio API error: {ex.Message} {ex.Code}");
+            UIHelper.ContinueMessage();
+            return;
+        }
     }
 }
